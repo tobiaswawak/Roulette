@@ -1,0 +1,42 @@
+Git Regeln für die Gruppenarbeit
+
+Projekt- und Gitverantwortliche
+• Tobias Wawak
+• Julian Köhnlein
+
+Commit Messages
+• Im Voraus werden Aufgabenblöcke definiert, auf welche die Commit Messages verweisen
+sollen.
+• Jeder Commit sollte eine klare und aussagekräftige Commit-Nachricht haben.
+• Die Nachricht sollte auf Englisch verfasst sein.
+• Es soll der Imperativ verwendet werden, z.B., "Fix bug" statt "Fixed bug" oder "Fixes bug."
+Die Commit Message sollte konkret so aussehen:
+„Aufgabennummer: Verrichtete Arbeit“
+
+Commit-Tags
+Es sollen Tags wie "FEATURE:", "BUGFIX:", oder "REFACTOR:" in deinen Commit-Nachrichten
+verwendet werden, um den Typ der Änderung klar zu kennzeichnen.
+
+Branch-Namensgebung
+• Für jeden Aufgabenblock soll ein Branch erstellt werden, der die Nummer des Branches enthält,
+um eine Verknüpfung zwischen Aufgabe und Zweck zu schaffen.
+• Der Branch enthält ausschließlich den Code der spezifischen Aufgabe
+• Abkürzungen und Kürzel sollten vermieden werden
+Ein Branch-Name sollte wie folgt aussehen: „Aufgabennummer“
+
+Merging
+• Direkt Commits auf den Master-Branch sind nicht erlaubt.
+• Vor dem Merge eines Branches in den Produktivstand, den „master“ / „main“, muss der den
+Code vom Projekverantwortlichen überprüft werden, um Fehler zu vermeiden.
+• Für das Zusammenführen von Branches werden Pull Requests verrichtet.
+• Vor dem Merge sollte der Feature-Branch aktualisiert werden, dass er auf dem neuesten Stand
+des Master-Branches ist.
+
+Commit-Historie
+Um die Commit-Historie sauber zu halten und unnötige Merge-Commits zu vermeiden, werden
+Merges in den main-Branch gesammelt gemacht
+
+Kommentare im Code
+Es sollen Kommentare an Stellen hinzugefügt werden, an denen es notwendig ist, um komplexe
+Abschnitte des Codes zu erklären. Redundante Kommentare,, die offensichtlichen Code
+beschreiben, sollen allerdings vermieden werden.
