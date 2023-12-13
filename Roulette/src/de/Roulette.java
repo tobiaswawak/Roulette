@@ -23,9 +23,6 @@ public class Roulette {
 		}
 	}
 
-
-
-
 	public static void main(String[] args) throws InterruptedException{
 		int spielgeld = 1000;
 		Random rand = new Random();
@@ -34,19 +31,26 @@ public class Roulette {
 		boolean spielen = true;
 		while (spielen == true && spielgeld > (-1000))
 		{
-			System.out.println("Aktueller Kontostand: " + spielgeld + "€");
+			if (spielgeld >= 0)
+			{
+				System.out.println("\u001B[32mAktueller Kontostand: " + spielgeld + "€\u001B[0m");
+			}
+			else
+			{
+				System.out.println("\u001B[31mAktueller Kontostand: " + spielgeld + "€\u001B[0m");
+			}
 			System.out.println("Auf was möchtest du setzen? Zahl oder Farbe");
 			Scanner eingabewert = new Scanner(System.in);
 			String wahl = eingabewert.nextLine();
 			if (wahl.equalsIgnoreCase("Zahl"))
 			{
-				System.out.println("Wie hoch ist der Geldeinsatz?");
-				einsatz = eingabewert.nextInt();
-				eingabewert.nextLine();
 				System.out.println("Auf welche Zahl möchtest du setzen? (0 - 36)");
 				int zahl = eingabewert.nextInt();
+				eingabewert.nextLine();
 				if (zahl >= 0 && zahl <= 36)
 				{
+					System.out.println("Wie hoch ist der Geldeinsatz?");
+					einsatz = eingabewert.nextInt();
 					drehen();
 					eingabewert.nextLine();
 					int ergebnis = rand.nextInt(36);
@@ -89,13 +93,13 @@ public class Roulette {
 			}
 			else if (wahl.equalsIgnoreCase("Farbe"))
 			{
-				System.out.println("Wie hoch ist der Geldeinsatz?");
-				einsatz = eingabewert.nextInt();
-				eingabewert.nextLine();
 				System.out.println("Auf welche Farbe möchtest du setzen?");
 				String farbe = eingabewert.nextLine();
 				if (farbe.equalsIgnoreCase("Rot"))
 				{
+					System.out.println("Wie hoch ist der Geldeinsatz?");
+					einsatz = eingabewert.nextInt();
+					eingabewert.nextLine();
 					drehen();
 					int ergebnis = rand.nextInt(36);
 					Thread.sleep(1200);
@@ -129,6 +133,9 @@ public class Roulette {
 				}
 				else if (farbe.equalsIgnoreCase("Schwarz"))
 				{
+					System.out.println("Wie hoch ist der Geldeinsatz?");
+					einsatz = eingabewert.nextInt();
+					eingabewert.nextLine();
 					drehen();
 					int ergebnis = rand.nextInt(36);
 					Thread.sleep(1200);
@@ -161,6 +168,9 @@ public class Roulette {
 				}
 				else if (farbe.equalsIgnoreCase("Grün"))
 				{
+					System.out.println("Wie hoch ist der Geldeinsatz?");
+					einsatz = eingabewert.nextInt();
+					eingabewert.nextLine();
 					drehen();
 					int ergebnis = rand.nextInt(36);
 					boolean gewonnen = false;
