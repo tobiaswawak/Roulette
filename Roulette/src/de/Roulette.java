@@ -1,8 +1,8 @@
-package programmieren1.Roulette;
+package de;
 import java.util.Random;
 import java.util.Scanner;
 
-public class Roulette5 {
+public class Roulette {
 
     private static boolean spielen = true;
     private static String[] spiel = {"zahl", "farbe"};
