@@ -1,15 +1,179 @@
-package de;
-import java.util.Random;
-import java.util.Scanner;
+package programmieren1.Roulette;
 import java.util.Random;
 import java.util.Scanner;
 
-public class Roulette {
-    public static boolean enthält(int[] rot, int ergebnis) {
+public class Roulette5 {
+
+    private static boolean spielen = true;
+    private static String[] spiel = {"zahl", "farbe"};
+    private static String[] farben = {"rot","schwarz","grün"};
+    private static int [] rot = {1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36};
+
+    public static void main(String[] args) throws InterruptedException{
+        int einsatz = 0;
+        int konto = 1000;
+
+        System.out.println("--------------------------------------------------");
+        System.out.println("    Herzlich Willkommen in unserem Casino	");
+        System.out.println("--------------------------------------------------");
+        System.out.println();
+
+        roulette(konto, einsatz, rot);
+    }
+
+    public static void roulette(int konto, int einsatz, int[] rot) throws InterruptedException{
+        Random rand = new Random();
+        Scanner scanner = new Scanner(System.in);
+
+        while (spielen == true) {
+
+            kontostandAusgeben(konto);
+
+            // Spielauswahl Nutzer
+            System.out.println("Auf was möchtest du setzen? Zahl oder Farbe");
+            String eingabe = scanner.nextLine();
+
+            // Prüfen der Eingabe
+            while (eingabeKorrekt(eingabe,spiel) != true) {
+                System.out.println("Fehlerhafte Eingabe! Bitte Zahl oder Farbe angeben.");
+                eingabe = scanner.nextLine();
+                eingabeKorrekt(eingabe,spiel);
+            }
+
+            // Programmauswahl
+            if (eingabe.equalsIgnoreCase("Zahl")) {
+                konto = spielZahl(scanner, konto, einsatz, rot, rand);
+            } else if (eingabe.equalsIgnoreCase("Farbe")) {
+                konto = spielFarbe(scanner, konto, einsatz, rot, rand);
+            }
+
+            // Neues Spiel?
+            Thread.sleep(600);
+            System.out.println("\rMöchtest du weiterspielen? (J/N)");
+
+            eingabe = scanner.nextLine();
+            if (eingabe != null ) {
+                eingabe = scanner.nextLine();
+            }
+
+            while (neuesSpiel(scanner,eingabe) != true) {
+                System.out.println("Fehlerhafte Eingabe! Bitte Ja oder Nein angeben.");
+                eingabe = scanner.nextLine();
+                neuesSpiel(scanner, eingabe);
+            }
+        }
+
+        // Ende
+        kontostandAusgeben(konto);
+        System.out.println("\rDanke fürs Spielen!");
+    }
+
+    private static void kontostandAusgeben(int konto) {
+        if (konto >= 0) {
+            System.out.println("\u001B[32mAktueller Kontostand: " + konto + "€\u001B[0m");
+            System.out.println();
+        } else {
+            System.out.println("\u001B[31mAktueller Kontostand: " + konto + "€\u001B[0m");
+            System.out.println();
+        }
+    }
+
+    private static int spielFarbe(Scanner scanner, int konto, int einsatz, int[] rot, Random rand) throws InterruptedException {
+
+        System.out.println("Auf welche Farbe möchtest du setzen? (Rot / Schwarz / Grün)");
+        String eingabe = scanner.nextLine();
+
+        while (eingabeKorrekt(eingabe, farben) != true) {
+            System.out.println("Fehlerhafte Eingabe! Bitte Rot, Schwarz oder Grün angeben.");
+            eingabe = scanner.nextLine();
+            eingabeKorrekt(eingabe, farben);
+        }
+
+        System.out.println("Wie hoch ist der Geldeinsatz?");
+        einsatz = scanner.nextInt();
+        konto = konto - einsatz;
+        drehen();
+        int ergebnis = rand.nextInt(36);
+        Thread.sleep(1200);
+
+        // Farbliches Ausgeben des Ergebnisses
+        kugelAuf(ergebnis);
+
+        if (eingabe.equalsIgnoreCase("Rot")) {
+            if (arrayEnthaelt(rot, ergebnis) == true) {
+                konto = gewonnen(konto, einsatz, 2);
+            } else {
+                verloren(konto, einsatz);
+            }
+        } else if (eingabe.equalsIgnoreCase("Schwarz")) {
+            if (arrayEnthaelt(rot, ergebnis) == false && ergebnis != 0) {
+                konto = gewonnen(konto, einsatz, 2);
+            } else {
+                verloren(konto, einsatz);
+            }
+
+        } else if (eingabe.equalsIgnoreCase("Grün")) {
+            Thread.sleep(1200);
+            if (ergebnis == 0) {
+                konto = gewonnen(konto, einsatz, 35);
+            } else {
+                verloren(konto, einsatz);
+            }
+
+        } else {
+            System.out.println("Eine fehlerhafte Eingabe wurde getätigt!");
+            spielFarbe(scanner, konto, einsatz, rot, rand);
+        }
+        return konto;
+    }
+
+    private static int spielZahl(Scanner scanner, int konto, int einsatz, int[] rot, Random rand) throws InterruptedException {
+
+        System.out.println("Auf welche Zahl möchtest du setzen? (0 - 36)");
+        int eingabe = scanner.nextInt();
+
+        if (eingabe >= 0 && eingabe <= 36) {
+            System.out.println("Wie hoch ist der Geldeinsatz?");
+            einsatz = scanner.nextInt();
+            konto = konto - einsatz;
+
+            drehen();
+
+            scanner.nextLine();
+            int ergebnis = rand.nextInt(36);
+            Thread.sleep(1200);
+
+            // Farbliches Ausgeben des Ergebnisses
+            kugelAuf(ergebnis);
+
+            if (eingabe == ergebnis) {
+                konto = gewonnen(konto, einsatz, 36);
+            } else {
+                verloren(konto, einsatz);
+            }
+
+        } else {
+            System.out.println("Die Zahl ist nicht zugelassen!");
+            spielZahl(scanner, konto, einsatz, rot, rand);
+        }
+        return konto;
+    }
+
+    public static boolean eingabeKorrekt(String eingabe, String[] ergebnis) {
+        for (String string : ergebnis) {
+            if (eingabe.equalsIgnoreCase(string)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean arrayEnthaelt (int[] rot, int ergebnis) {
         boolean gewonnen = false;
-
-        for (int i = 0; i < rot.length; i++) { //Schleife durchläuft Array rot. Wenn der Wert ergebnis gleich einem der
-            if (rot[i] == ergebnis) {          // Werte des Arrays ist wird gewonnen true. Wert von gewonnen wird am Ende der Methode zurückgeliefert
+        //Schleife durchläuft Array rot. Wenn der Wert ergebnis gleich einem der
+        for (int i = 0; i < rot.length; i++) {
+            // Werte des Arrays ist wird gewonnen true. Wert von gewonnen wird am Ende der Methode zurückgeliefert
+            if (rot[i] == ergebnis) {
                 gewonnen = true;
             }
         }
@@ -21,222 +185,51 @@ public class Roulette {
         for (int i = 0; i < 8; i++) {
             System.out.print("\rDie Kugel dreht sich... " + random.nextInt(36));
             System.out.println();
-            Thread.sleep(300);
+            Thread.sleep(400);
         }
     }
 
-    public static void roulette(boolean spielen, int spielgeld, int einsatz, int[] rot) throws InterruptedException{
-        Random rand = new Random();
-        while (spielen == true && spielgeld > (-1000))
-        {
-            if (spielgeld >= 0)
-            {
-                System.out.println("\u001B[32mAktueller Kontostand: " + spielgeld + "€\u001B[0m");
-            }
-            else
-            {
-                System.out.println("\u001B[31mAktueller Kontostand: " + spielgeld + "€\u001B[0m");
-            }
-            System.out.println("Auf was möchtest du setzen? Zahl oder Farbe");
-            Scanner eingabewert = new Scanner(System.in);
-            String wahl = eingabewert.nextLine();
-            if (wahl.equalsIgnoreCase("Zahl"))
-            {
-                System.out.println("Auf welche Zahl möchtest du setzen? (0 - 36)");
-                int zahl = eingabewert.nextInt();
-                eingabewert.nextLine();
-                if (zahl >= 0 && zahl <= 36)
-                {
-                    System.out.println("Wie hoch ist der Geldeinsatz?");
-                    einsatz = eingabewert.nextInt();
-                    spielgeld = spielgeld - einsatz;
-                    drehen();
-                    eingabewert.nextLine();
-                    int ergebnis = rand.nextInt(36);
-                    Thread.sleep(1200);
-                    if (zahl == ergebnis)
-                    {
-                        System.out.println("Du hast gewonnen!");
-                        spielgeld = spielgeld + einsatz * 36;
-                        System.out.println("\u001B[32mDer Gewinn beträgt: " + einsatz * 36 + "€\u001B[0m");
-                    }
-                    else
-                    {
-                        System.out.println("Leider verloren!");
-                        Thread.sleep(300);
-                        if (enthält(rot, ergebnis) == true)
-                        {
-                            System.out.println("Die Kugel liegt auf \u001B[31m" + ergebnis + "\u001B[0m.");
-                            System.out.println("\u001B[31mDer Verlust beträgt: -" + einsatz + "€\u001B[0m");
-                        }
-                        else if (enthält(rot, ergebnis) == false && ergebnis != 0)
-                        {
-                            System.out.println("Die Kugel liegt auf \u001B[30m" + ergebnis + "\u001B[0m.");
-                            System.out.println("\u001B[31mDer Verlust beträgt: -" + einsatz + "€\u001B[0m");
-                        }
-                        else {
-                            System.out.println("Die Kugel liegt auf \u001B[32m" + ergebnis + "\u001B[0m.");
-                            System.out.println("\u001B[31mDer Verlust beträgt: -" + einsatz + "€\u001B[0m");
-                        }
-                    }
-
-                }
-                else
-                {
-                    System.out.println("Die Zahl ist nicht zugelassen!");
-                }
-
-            }
-            else if (wahl.equalsIgnoreCase("Farbe"))
-            {
-                System.out.println("Auf welche Farbe möchtest du setzen?");
-                String farbe = eingabewert.nextLine();
-                if (farbe.equalsIgnoreCase("Rot"))
-                {
-                    System.out.println("Wie hoch ist der Geldeinsatz?");
-                    einsatz = eingabewert.nextInt();
-                    eingabewert.nextLine();
-                    spielgeld = spielgeld - einsatz;
-                    drehen();
-                    int ergebnis = rand.nextInt(36);
-                    Thread.sleep(1200);
-                    if (enthält(rot, ergebnis) == true)
-                    {
-                        System.out.println("Du hast gewonnen!");
-                        Thread.sleep(300);
-                        System.out.println("Die Kugel liegt auf \u001B[31m" + ergebnis + "\u001B[0m.");
-                        spielgeld = spielgeld + einsatz * 2;
-                        System.out.println("\u001B[32mDer Gewinn beträgt: " + einsatz * 2 + "€\u001B[0m");
-
-                    }
-                    else
-                    {
-                        System.out.println("Du hast leider verloren");
-                        Thread.sleep(300);
-                        if (ergebnis != 0)
-                        {
-                            System.out.println("Die Kugel liegt auf \u001B[30m" + ergebnis + "\u001B[0m.");
-                            System.out.println("\u001B[31mDer Verlust beträgt: -" + einsatz + "€\u001B[0m");
-                        }
-                        else
-                        {
-                            System.out.println("Die Kugel liegt auf \u001B[32m" + ergebnis + "\u001B[0m.");
-                            System.out.println("\u001B[31mDer Verlust beträgt: -" + einsatz + "€\u001B[0m");
-                        }
-                    }
-
-                }
-                else if (farbe.equalsIgnoreCase("Schwarz"))
-                {
-                    System.out.println("Wie hoch ist der Geldeinsatz?");
-                    einsatz = eingabewert.nextInt();
-                    spielgeld = spielgeld - einsatz;
-                    eingabewert.nextLine();
-                    drehen();
-                    int ergebnis = rand.nextInt(36);
-                    Thread.sleep(1200);
-                    if (enthält(rot, ergebnis) == false)
-                    {
-                        System.out.println("Du hast gewonnen!");
-                        Thread.sleep(300);
-                        System.out.println("Die Kugel liegt auf \u001B[30m" + ergebnis + "\u001B[0m.");
-                        spielgeld = spielgeld + einsatz * 2;
-                        System.out.println("\u001B[32mDer Gewinn beträgt: " + einsatz * 2 + "€\u001B[0m");
-                    }
-                    else
-                    {
-                        System.out.println("Du hast leider verloren");
-                        Thread.sleep(300);
-                        if (ergebnis != 0)
-                        {
-                            System.out.println("Die Kugel liegt auf \u001B[31m" + ergebnis + "\u001B[0m.");
-                            System.out.println("\u001B[31mDer Verlust beträgt: -" + einsatz + "€\u001B[0m");
-                        }
-                        else
-                        {
-                            System.out.println("Die Kugel liegt auf \u001B[32m" + ergebnis + "\u001B[0m.");
-                            System.out.println("\u001B[31mDer Verlust beträgt: -" + einsatz + "€\u001B[0m");
-                        }
-                    }
-
-                }
-                else if (farbe.equalsIgnoreCase("Grün"))
-                {
-                    System.out.println("Wie hoch ist der Geldeinsatz?");
-                    einsatz = eingabewert.nextInt();
-                    eingabewert.nextLine();
-                    spielgeld = spielgeld - einsatz;
-                    drehen();
-                    int ergebnis = rand.nextInt(36);
-                    boolean gewonnen = false;
-                    if (ergebnis == 0)
-                    {
-                        gewonnen = true;
-                    }
-                    else
-                    {
-                        gewonnen = false;
-                    }
-                    Thread.sleep(1200);
-                    if (gewonnen = true)
-                    {
-                        System.out.println("Du hast gewonnen!");
-                        Thread.sleep(300);
-                        System.out.println("Die Kugel liegt auf \u001B[32m" + ergebnis + "\u001B[0m.");
-                        spielgeld = spielgeld + einsatz * 2;
-                        System.out.println("\u001B[32mDer Gewinn beträgt: " + einsatz * 2 + "€\u001B[0m");
-                    }
-                    else
-                    {
-                        System.out.println("Du hast leider verloren");
-                        Thread.sleep(300);
-                        if (enthält(rot, ergebnis) == true)
-                        {
-                            System.out.println("Die Kugel liegt auf \u001B[31m" + ergebnis + "\u001B[0m.");
-                            System.out.println("\u001B[31mDer Verlust beträgt: -" + einsatz + "€\u001B[0m");
-                        }
-                        else
-                        {
-                            System.out.println("Die Kugel liegt auf \u001B[30m" + ergebnis + "\u001B[0m.");
-                            System.out.println("\u001B[31mDer Verlust beträgt: -" + einsatz + "€\u001B[0m");
-                        }
-                    }
-
-                }
-                else
-                {
-                    System.out.println("Eine fehlerhafte Eingabe wurde getätigt!");
-                }
-            }
-            else
-            {
-                System.out.println("Eine fehlerhafte Eingabe wurde getätigt!");
-            }
-            Thread.sleep(1800);
-            System.out.println("Möchtest du weiterspielen?");
-            Thread.sleep(600);
-            String antwort = eingabewert.nextLine();
-
-            if (antwort.equalsIgnoreCase("Ja")) {
-                einsatz = 0;
-                spielen = true;
-            } else if (antwort.equalsIgnoreCase("Nein")) {
-                spielen = false;
-            } else {
-                System.out.println("Fehlerhafte Eingabe");
-                Thread.sleep(1800);
-                return;
-            }
+    private static void kugelAuf(int ergebnis) {
+        if (arrayEnthaelt(rot, ergebnis) == true) {
+            // rot
+            System.out.println("\rDie Kugel liegt auf \u001B[31m" + ergebnis + "\u001B[0m.");
+        } else if (arrayEnthaelt(rot, ergebnis) == false && ergebnis != 0) {
+            // schwarz
+            System.out.println("\rDie Kugel liegt auf \u001B[30m" + ergebnis + "\u001B[0m.");
+        } else {
+            // grün
+            System.out.println("\rDie Kugel liegt auf \u001B[30m" + ergebnis + "\u001B[0m.");
         }
     }
 
+    private static int gewonnen(int konto, int einsatz, int multiplier) throws InterruptedException {
 
-    public static void main(String[] args) throws InterruptedException{
-            int spielgeld = 1000;
-
-            int einsatz = 0;
-            int [] rot = {1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36};
-            boolean spielen = true;
-            roulette(spielen, spielgeld, einsatz, rot);
+        System.out.println();
+        System.out.println("Du hast gewonnen!");
+        Thread.sleep(300);
+        System.out.println("\u001B[32mDer Gewinn beträgt: " + einsatz * 2 + "€\u001B[0m");
+        konto = konto + (einsatz * multiplier);
+        return konto;
     }
+
+    private static void verloren(int konto, int einsatz) throws InterruptedException {
+        System.out.println("Du hast leider verloren");
+        Thread.sleep(300);
+        System.out.println("\u001B[31mDer Verlust beträgt: -" + einsatz + "€\u001B[0m");
+    }
+
+    private static boolean neuesSpiel(Scanner scanner, String antwort) {
+
+        if (antwort.equalsIgnoreCase("Ja") || antwort.equalsIgnoreCase("J")) {
+            spielen = true;
+            return true;
+        } else if (antwort.equalsIgnoreCase("Nein") || antwort.equalsIgnoreCase("N")) {
+            spielen = false;
+            return true;
+        } else {
+            return false;
+        }
+
+    }
+
 }
