@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.Random;
 import java.util.Scanner;
 
+// Kontrolle Kontostand hinzugefügt und in methode verlagert
+
 public class Roulette {
 
 	private static boolean spielen = true;
@@ -59,28 +61,34 @@ public class Roulette {
 	}
 
 	public static void main(String[] args) throws InterruptedException{
-		int einsatz = 0;
-		int konto = 1000;
 
 		System.out.println("--------------------------------------------------");
 		System.out.println("    Herzlich Willkommen in unserem Casino	");
 		System.out.println("--------------------------------------------------");
 		System.out.println();
-
-		try {
-			roulette(konto, einsatz);
+		
+		System.out.println("Wir bieten Ihnen die Möglichkeit auf eine beliebige Zahl zwischen 0-36 zu setzen\noder auf die Farben Schwarz, Rot oder Grün.\n");
+		System.out.println("Ihre Gewinnchancen und möglichen Gewinne:\n");
+		System.out.println("Schwarz\t\tGewinnchance: 48,6%\tGewinn: 1:1");
+		System.out.println("Rot\t\tGewinnchance: 48,6%\tGewinn: 1:1");
+		System.out.println("Grün\t\tGewinnchance: 2,7%\tGewinn: 35:1");
+		System.out.println("Beliebige Zahl\tGewinnchance: 02,7%\tGewinn: 35:1");
+		System.out.println();
+	
+		try (Scanner scanner = new Scanner(System.in)){
+			int konto = kontoAufladen(scanner);		
+			kontostandAusgeben(konto);
+			roulette(konto, scanner);
 		} catch (Exception e) {
 			System.out.println("Es gab einen Fehler. Bitte Spiel neustarten!");
 		}
 	}
 
-	public static void roulette(int konto, int einsatz) throws InterruptedException{
+	public static void roulette(int konto, Scanner scanner) throws InterruptedException{
 		Random rand = new Random();
-		Scanner scanner = new Scanner(System.in);
-
+		String empty = scanner.nextLine();
+		
 		while (spielen == true) {
-
-			kontostandAusgeben(konto);
 
 			// Spielauswahl Nutzer
 			System.out.println("Auf was möchtest du setzen? Zahl oder Farbe");
@@ -95,18 +103,20 @@ public class Roulette {
 
 			// Programmauswahl
 			if (eingabe.equalsIgnoreCase("Zahl")) {
-				konto = spielZahl(scanner, konto, einsatz, rand);			
+				konto = spielZahl(scanner, konto, rand);			
 			} else if (eingabe.equalsIgnoreCase("Farbe")) {
-				konto = spielFarbe(scanner, konto, einsatz, rand);
+				konto = spielFarbe(scanner, konto, rand);
 			}
+			
+			kontostandAusgeben(konto);
 
 			// Neues Spiel?
 			Thread.sleep(600);
-			System.out.println("\rMöchtest du weiterspielen? (J/N)");
-
+			System.out.println("Möchtest du weiterspielen? (Ja / Nein)");
+			empty = scanner.nextLine();
 			String erneutSpielen = scanner.nextLine();
 
-			if (erneutSpielen != null) {
+			if (erneutSpielen == null) {
 				erneutSpielen = scanner.nextLine();
 			}
 
@@ -116,12 +126,12 @@ public class Roulette {
 				erneutSpielen = scanner.nextLine();
 				neuesSpiel(scanner, erneutSpielen);
 			}
-			erneutSpielen="";
 		}
 
 		// Ende 
+		System.out.println();
 		kontostandAusgeben(konto);
-		System.out.println("\rDanke fürs Spielen!");
+		System.out.println("Danke fürs Spielen!");
 	}
 
 	private static void kontostandAusgeben(int konto) {
@@ -134,7 +144,7 @@ public class Roulette {
 		}
 	}
 
-	private static int spielFarbe(Scanner scanner, int konto, int einsatz, Random rand) throws InterruptedException {
+	private static int spielFarbe(Scanner scanner, int konto, Random rand) throws InterruptedException {
 
 		System.out.println("Auf welche Farbe möchtest du setzen? (Rot / Schwarz / Grün)");
 		String eingabe = scanner.nextLine();
@@ -145,10 +155,9 @@ public class Roulette {
 			eingabeKorrekt(eingabe, farben);
 		}
 
-		System.out.println("Wie hoch ist der Geldeinsatz?");
-		einsatz = scanner.nextInt();
+		int einsatz = geldSetzen(scanner, konto);
 		konto = konto - einsatz;
-
+		
 		// Zufälige Startpositin und Endposition
 		Random randomizer = new Random();
 		int startPosition = randomizer.nextInt(0, 37);
@@ -183,14 +192,14 @@ public class Roulette {
 		return konto;
 	} 
 
-	private static int spielZahl(Scanner scanner, int konto, int einsatz, Random rand) throws InterruptedException {
+	private static int spielZahl(Scanner scanner, int konto, Random rand) throws InterruptedException {
 
 		System.out.println("Auf welche Zahl möchtest du setzen? (0 - 36)");
 		int eingabe = scanner.nextInt();
 
 		if (eingabe >= 0 && eingabe <= 36) {
-			System.out.println("Wie hoch ist der Geldeinsatz?");
-			einsatz = scanner.nextInt();
+			
+			int einsatz = geldSetzen(scanner, konto);
 			konto = konto - einsatz;
 
 			drehen();
@@ -210,9 +219,22 @@ public class Roulette {
 
 		} else {
 			System.out.println("Die Zahl ist nicht zugelassen!");
-			spielZahl(scanner, konto, einsatz, rand);
+			spielZahl(scanner, konto, rand);
 		}
 		return konto;
+	}
+
+	private static int geldSetzen(Scanner scanner, int konto) {
+		System.out.println("Wie hoch ist der Geldeinsatz?");
+		int einsatz = scanner.nextInt();
+		
+		while (pruefeKontostand(konto, einsatz) != true) {
+			System.out.println("Konto überzogen! Bitte kleineren Betrag angeben");
+			einsatz = scanner.nextInt();
+			pruefeKontostand(konto, einsatz);
+		}
+		
+		return einsatz;
 	}
 
 	public static boolean eingabeKorrekt(String eingabe, String[] ergebnis) {	
@@ -223,7 +245,37 @@ public class Roulette {
 		}
 		return false;		
 	}
-
+	
+	public static boolean pruefeKontostand(int konto, int einsatz) {	
+		if (einsatz > konto) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+	
+	public static int kontoAufladen(Scanner scanner) {	
+		System.out.println("Wie viel möchten Sie aufladen? (1-1000€ möglich)");
+		int eingabe = scanner.nextInt();
+		
+		while (pruefeEingabeKontostand(eingabe) == false) {
+			System.out.println("Bitte einen Betrag zwischen 1€ und 1000€ eingeben:");
+			eingabe = scanner.nextInt();
+			pruefeEingabeKontostand(eingabe);
+		}
+		System.out.println("");
+		
+		return eingabe;
+	}
+	
+	public static boolean pruefeEingabeKontostand(int eingabe) {	
+		if (eingabe > 1000 || eingabe < 1) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+	
 	private static void ausgabeFarben(int startPosition, int winningNumber) throws InterruptedException {
 
 		int currentPos = startPosition;
@@ -272,6 +324,9 @@ public class Roulette {
 	}
 
 	private static void kugelAuf(int ergebnis) {
+		
+		
+		
 		if (arrayEnthaelt(rot, ergebnis) == true) {
 			// rot
 			System.out.println("\rDie Kugel liegt auf \u001B[31m" + ergebnis + "\u001B[0m.");
@@ -301,7 +356,6 @@ public class Roulette {
 	}
 
 	private static boolean neuesSpiel(Scanner scanner, String antwort) {
-
 		if (antwort.equalsIgnoreCase("Ja") || antwort.equalsIgnoreCase("J")) {
 			spielen = true;
 			return true;
@@ -311,9 +365,5 @@ public class Roulette {
 		} else {
 			return false;			
 		}
-
 	}
-
-
-
 }
