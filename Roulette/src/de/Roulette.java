@@ -4,415 +4,432 @@ import java.util.HashMap;
 import java.util.Random;
 import java.util.Scanner;
 
-// Kontrolle Kontostand hinzugefügt und in methode verlagert
+/*
+ * Roulette.java realisiert eine vereinfachte Form von Roulette, bei der auf eine Zahl oder eine Farbe gesetzt werden kann.
+ * Zudem ist bei dem Spiel ein Konto eingebunden
+ *
+ * Autoren: Tobias Wawak, Jonas Bauer, Julian Köhnlein, Pia Kühnle, Elia Küstner
+ */
+
 public class Roulette {
 
-	private static boolean play = true;
-	private static String[] gameSelection = {"zahl", "farbe"};
-	private static String[] colourSelection = {"rot","schwarz","grün"};
-	private static final HashMap <String, String> colourDots = new HashMap<>();
-	static {
-		colourDots.put("🟢", "grün");
-		colourDots.put("🔴", "rot");
-		colourDots.put("⚫", "schwarz");
-	}
+    private static boolean play = true;
+    private static String[] gameSelection = {"zahl", "farbe"};
+    private static String[] colourSelection = {"rot","schwarz","grün"};
+    private static final HashMap <String, String> colourDots = new HashMap<>();
+    static {
+        colourDots.put("🟢", "grün");
+        colourDots.put("🔴", "rot");
+        colourDots.put("⚫", "schwarz");
+    }
 
-	private static final HashMap<Integer, String> wheel = new HashMap<>();
-	static {
-		wheel.put(0, "🟢");
-		wheel.put(1, "🔴");
-		wheel.put(2, "⚫");
-		wheel.put(3, "🔴");
-		wheel.put(4, "⚫");
-		wheel.put(5, "🔴");
-		wheel.put(6, "⚫");
-		wheel.put(7, "🔴");
-		wheel.put(8, "⚫");
-		wheel.put(9, "🔴");
-		wheel.put(10, "⚫");
-		wheel.put(11, "🔴");
-		wheel.put(12, "⚫");
-		wheel.put(13, "🔴");
-		wheel.put(14, "⚫");
-		wheel.put(15, "🔴");
-		wheel.put(16, "⚫");
-		wheel.put(17, "🔴");
-		wheel.put(18, "⚫");
-		wheel.put(19, "🔴");
-		wheel.put(20, "⚫");
-		wheel.put(21, "🔴");
-		wheel.put(22, "⚫");
-		wheel.put(23, "🔴");
-		wheel.put(24, "⚫");
-		wheel.put(25, "🔴");
-		wheel.put(26, "⚫");
-		wheel.put(27, "🔴");
-		wheel.put(28, "⚫");
-		wheel.put(29, "🔴");
-		wheel.put(30, "⚫");
-		wheel.put(31, "🔴");
-		wheel.put(32, "⚫");
-		wheel.put(33, "🔴");
-		wheel.put(34, "⚫");
-		wheel.put(35, "🔴");
-		wheel.put(36, "⚫");
-	}
+    private static final HashMap<Integer, String> wheel = new HashMap<>();
+    static {
+        wheel.put(0, "🟢");
+        wheel.put(1, "🔴");
+        wheel.put(2, "⚫");
+        wheel.put(3, "🔴");
+        wheel.put(4, "⚫");
+        wheel.put(5, "🔴");
+        wheel.put(6, "⚫");
+        wheel.put(7, "🔴");
+        wheel.put(8, "⚫");
+        wheel.put(9, "🔴");
+        wheel.put(10, "⚫");
+        wheel.put(11, "🔴");
+        wheel.put(12, "⚫");
+        wheel.put(13, "🔴");
+        wheel.put(14, "⚫");
+        wheel.put(15, "🔴");
+        wheel.put(16, "⚫");
+        wheel.put(17, "🔴");
+        wheel.put(18, "⚫");
+        wheel.put(19, "🔴");
+        wheel.put(20, "⚫");
+        wheel.put(21, "🔴");
+        wheel.put(22, "⚫");
+        wheel.put(23, "🔴");
+        wheel.put(24, "⚫");
+        wheel.put(25, "🔴");
+        wheel.put(26, "⚫");
+        wheel.put(27, "🔴");
+        wheel.put(28, "⚫");
+        wheel.put(29, "🔴");
+        wheel.put(30, "⚫");
+        wheel.put(31, "🔴");
+        wheel.put(32, "⚫");
+        wheel.put(33, "🔴");
+        wheel.put(34, "⚫");
+        wheel.put(35, "🔴");
+        wheel.put(36, "⚫");
+    }
 
-	public static void main(String[] args) throws InterruptedException{
+    public static void main(String[] args) throws InterruptedException{
 
-		System.out.println("⚫🔴⚫🔴⚫🔴⚫🔴⚫🔴⚫🔴⚫🔴⚫🔴⚫🔴⚫🔴⚫");
-		System.out.println();
-		System.out.println("--- Herzlich Willkommen zu unserem Roulette ---");
-		System.out.println();
-		System.out.println("⚫🔴⚫🔴⚫🔴⚫🔴⚫🔴⚫🔴⚫🔴⚫🔴⚫🔴⚫🔴⚫");
-		System.out.println();
-
-
-		Thread.sleep(1000);
-		System.out.println("Setze auf eine beliebige Zahl zwischen 0-36 oder \nauf die Farben Schwarz, Rot oder Grün und gewinne!\n");
-		Thread.sleep(1000);
-
-		System.out.println("-------------------------------------------\n");
-		System.out.println("Ihre Gewinnchancen und möglichen Gewinne:\n");
-		System.out.println("⚫ Schwarz \t\tGewinnchance: 48,6%\tGewinn: 1:1");
-		System.out.println("🔴 Rot \t\t\tGewinnchance: 48,6%\tGewinn: 1:1");
-		System.out.println("🟢 Grün \t\tGewinnchance: 2,7%\tGewinn: 35:1");
-		System.out.println("⬤ Beliebige Zahl\tGewinnchance: 2,7%\tGewinn: 35:1");
-		System.out.println();
-		System.out.println("-------------------------------------------\n");
+        System.out.println("⚫🔴⚫🔴⚫🔴⚫🔴⚫🔴⚫🔴⚫🔴⚫🔴⚫🔴⚫🔴⚫");
+        System.out.println();
+        System.out.println("--- Herzlich Willkommen zu unserem Roulette ---");
+        System.out.println();
+        System.out.println("⚫🔴⚫🔴⚫🔴⚫🔴⚫🔴⚫🔴⚫🔴⚫🔴⚫🔴⚫🔴⚫");
+        System.out.println();
 
 
-		try (Scanner scanner = new Scanner(System.in)){
-			int account = addToAccount(scanner);		
-			printAccount(account);
-			roulette(account, scanner);
-		} catch (Exception e) {
-			System.out.println("Es gab einen Fehler. Bitte Spiel neu starten!");
-		}
-	}
+        Thread.sleep(1000);
+        System.out.println("Setze auf eine beliebige Zahl zwischen 0-36 oder \nauf die Farben Schwarz, Rot oder Grün und gewinne!\n");
+        Thread.sleep(1000);
 
-	public static void roulette(int account, Scanner scanner) throws InterruptedException{
-		Random rand = new Random();
-		scanner.nextLine();
+        System.out.println("-------------------------------------------\n");
+        System.out.println("Ihre Gewinnchancen und möglichen Gewinne:\n");
+        System.out.println("⚫ Schwarz \t\tGewinnchance: 48,6%\tGewinn: 1:1");
+        System.out.println("🔴 Rot \t\t\tGewinnchance: 48,6%\tGewinn: 1:1");
+        System.out.println("🟢 Grün \t\tGewinnchance: 2,7%\tGewinn: 35:1");
+        System.out.println("⬤ Beliebige Zahl\tGewinnchance: 2,7%\tGewinn: 35:1");
+        System.out.println();
+        System.out.println("-------------------------------------------\n");
 
-		while (play == true && account > 0) {
 
-			// Spielauswahl Nutzer
-			System.out.println("Auf was möchtest du setzen? Zahl oder Farbe");
-			String eingabe = scanner.nextLine();
+        try (Scanner scanner = new Scanner(System.in)){
+            int account = addToAccount(scanner);
+            printAccount(account);
+            roulette(account, scanner);
+        } catch (Exception e) {
+            System.out.println("Es gab einen Fehler. Bitte Spiel neu starten!");
+        }
+    }
 
-			// Prüfen der Eingabe
-			while (isInputValid(eingabe.trim(), gameSelection) != true) {
-				System.out.println("Fehlerhafte Eingabe! Bitte Zahl oder Farbe angeben.");
-				eingabe = scanner.nextLine();
-				isInputValid(eingabe,gameSelection);
-			}
+    public static void roulette(int account, Scanner scanner) throws InterruptedException{
+        Random rand = new Random();
+        String empty = scanner.nextLine();
 
-			// Programmauswahl
-			if (eingabe.trim().equalsIgnoreCase("Zahl")) {
-				account = gameNumber(scanner, account, rand);			
-			} else if (eingabe.trim().equalsIgnoreCase("Farbe")) {
-				account = gameColour(scanner, account, rand);
-			}
+        while (play == true && account > 0) {
 
-			printAccount(account);
+            // Spielauswahl Nutzer
+            System.out.println("Auf was möchtest du setzen? Zahl oder Farbe");
+            String input = scanner.nextLine();
 
-			if (account <= 0) {
-				System.out.println("Du bist pleite!");
-				System.out.println("Danke fürs Spielen!");
-				return;
-			}
+            // Prüfen der Eingabe
+            while (isInputValid(input.trim(), gameSelection) != true) {
+                System.out.println("Fehlerhafte Eingabe! Bitte Zahl oder Farbe angeben.");
+                input = scanner.nextLine();
+                isInputValid(input,gameSelection);
+            }
 
-			// Neues Spiel?
-			Thread.sleep(600);
-			System.out.println("Möchtest du weiterspielen? (Ja / Nein)");
-			String playAgain = scanner.nextLine();
-			scanner.reset();
+            // Programmauswahl
+            if (input.trim().equalsIgnoreCase("Zahl")) {
+                account = gameNumber(scanner, account, rand);
+            } else if (input.trim().equalsIgnoreCase("Farbe")) {
+                account = gameColour(scanner, account, rand);
+            }
 
-			if (playAgain == null) {
-				playAgain = scanner.nextLine();
-			}
+            printAccount(account);
 
-			while (newGame(scanner,playAgain) != true) {
-				Thread.sleep(400);
-				System.out.println("Fehlerhafte Eingabe! Bitte Ja oder Nein angeben.");
-				playAgain = scanner.nextLine();
-				newGame(scanner, playAgain);
-			}
-		}
+            if (account <= 0) {
+                System.out.println("Du bist pleite!");
+                System.out.println("Danke fürs Spielen!");
+                return;
+            }
 
-		// Ende 
-		System.out.println();
-		printAccount(account);
-		System.out.println("Danke fürs Spielen!");
-	}
+            // Neues Spiel?
+            Thread.sleep(600);
+            System.out.println("Möchtest du weiterspielen? (Ja / Nein)");
+            String playAgain = scanner.nextLine();
+            scanner.reset();
 
-	private static void printAccount(int account) {
-		if (account > 0) {
-			System.out.println("\u001B[32mAktueller Kontostand: " + account + "€\u001B[0m");
-			System.out.println();
-		} else {
-			System.out.println("\u001B[31mAktueller Kontostand: " + account + "€\u001B[0m");
-			System.out.println();
-		}
-	}
+            if (playAgain == null) {
+                playAgain = scanner.nextLine();
+            }
 
-	private static int gameColour(Scanner scanner, int account, Random rand) throws InterruptedException {
+            while (newGame(scanner,playAgain) != true) {
+                Thread.sleep(400);
+                System.out.println("Fehlerhafte Eingabe! Bitte Ja oder Nein angeben.");
+                playAgain = scanner.nextLine();
+                newGame(scanner, playAgain);
+            }
+        }
 
-		System.out.println("Auf welche Farbe möchtest du setzen? (Rot / Schwarz / Grün)");
-		String eingabe = scanner.nextLine();
+        // Ende
+        System.out.println();
+        printAccount(account);
+        System.out.println("Danke fürs Spielen!");
+    }
 
-		while (isInputValid(eingabe, colourSelection) != true) {
-			System.out.println("Fehlerhafte Eingabe! Bitte Rot, Schwarz oder Grün angeben.");
-			eingabe = scanner.nextLine();
-			isInputValid(eingabe, colourSelection);
-		}
+    private static void printAccount(int account) {
+        if (account > 0) {
+            System.out.println("\u001B[32mAktueller Kontostand: " + account + "€\u001B[0m");
+            System.out.println();
+        } else {
+            System.out.println("\u001B[31mAktueller Kontostand: " + account + "€\u001B[0m");
+            System.out.println();
+        }
+    }
 
-		int einsatz = placeBet(scanner, account);
-		account = account - einsatz;
+    private static int gameColour(Scanner scanner, int account, Random rand) throws InterruptedException {
 
-		// Zufälige Startpositin und Endposition
-		Random randomizer = new Random();
-		int startPosition = randomizer.nextInt(0, 37);
-		int rollCount = randomizer.nextInt(20, 30);
+        System.out.println("Auf welche Farbe möchtest du setzen? (Rot / Schwarz / Grün)");
+        String input = scanner.nextLine();
 
-		// Errechnen der Gewinnzahl
-		int winningNumber = startPosition + rollCount;
+        while (isInputValid(input, colourSelection) != true) {
+            System.out.println("Fehlerhafte Eingabe! Bitte Rot, Schwarz oder Grün angeben.");
+            input = scanner.nextLine();
+            isInputValid(input, colourSelection);
+        }
 
-		if(winningNumber > 36) {
-			winningNumber = winningNumber - 37;
-		}
+        int bet = placeBet(scanner, account);
+        account = account - bet;
 
-		String winningColour = wheel.get(winningNumber);
+        // Zufälige Startposition und Endposition
+        Random randomizer = new Random();
+        int startPosition = randomizer.nextInt(0, 37);
+        int rollCount = randomizer.nextInt(20, 30);
 
-		System.out.println("");
-		System.out.println("Drehe das Roulette-Rad: ");
+        // Errechnen der Gewinnzahl
+        int winningNumber = startPosition + rollCount;
 
-		Thread.sleep(1000);
+        if(winningNumber > 36) {
+            winningNumber = winningNumber - 37;
+        }
 
-		// Ausgabe von Startposition		
-		printColourAnimation(startPosition, winningNumber);
+        String winningColour = wheel.get(winningNumber);
 
-		Thread.sleep(1000);
+        System.out.println("");
+        System.out.println("Drehe das Roulette-Rad: ");
 
-		if (eingabe.equals("grün") && eingabe.equals(colourDots.get(winningColour))) {
-			account = win(account, einsatz, 36);
-		} else if (eingabe.equals(colourDots.get(winningColour))) {
-			account = win(account, einsatz, 2);
-		} else {
-			lose(einsatz);
-		}
-		scanner.nextLine();
-		return account;
-	} 
+        Thread.sleep(1000);
 
-	private static int gameNumber(Scanner scanner, int account, Random rand) throws InterruptedException {
+        // Ausgabe von Startposition
+        printColourAnimation(startPosition, winningNumber);
 
-		System.out.println("Auf welche Zahl möchtest du setzen? (0 - 36)");
+        Thread.sleep(1000);
 
-		int eingabe = checkNumberInput(scanner);
-		
-		while (isNumberValid(eingabe) != true) {
-			System.out.println("Fehlerhafte Eingabe! Bitte eine Zahl zwischen 0 und 36 angeben");
-			eingabe = checkNumberInput(scanner);
-			isNumberValid(eingabe);
-		}
+        if (input.equals("grün") && input.equals(colourDots.get(winningColour))) {
+            account = win(account, bet, 36);
+        } else if (input.equals(colourDots.get(winningColour))) {
+            account = win(account, bet, 2);
+        } else {
+            lose(bet);
+        }
+        scanner.nextLine();
+        return account;
+    }
 
-		int einsatz = placeBet(scanner, account);
-		account = account - einsatz;
+    private static int gameNumber(Scanner scanner, int account, Random rand) throws InterruptedException {
 
-		printNumberAnimation();
+        System.out.println("Auf welche Zahl möchtest du setzen? (0 - 36)");
 
-		scanner.nextLine();
-		int ergebnis = rand.nextInt(36);
-		Thread.sleep(1200);
-		
-		// Farbliches Ausgeben des Ergebnisses
-		printWinningNumber(ergebnis);
+        int input = checkNumberInput(scanner);
 
-		if (eingabe == ergebnis) {
-			account = win(account, einsatz, 36);
-		} else {
-			lose(einsatz);
-		}
+        while (isNumberValid(input) != true) {
+            System.out.println("Fehlerhafte Eingabe! Bitte eine Zahl zwischen 0 und 36 angeben");
+            input = checkNumberInput(scanner);
+            isNumberValid(input);
+        }
 
-		return account;
-	}
+        int bet = placeBet(scanner, account);
+        account = account - bet;
 
-	private static boolean isNumberValid(int eingabe) {	
-		if (eingabe > 36 || eingabe < 0) {
-			return false;
-		} else {
-			return true;
-		}
-	}
+        printNumberAnimation();
 
-	public static boolean isAccountInputValid(int eingabe) {	
-		if (eingabe > 1000 || eingabe < 1) {
-			return false;
-		} else {
-			return true;
-		}
-	}
+        scanner.nextLine();
+        int result = rand.nextInt(36);
+        Thread.sleep(1200);
 
-	private static int placeBet(Scanner scanner, int account) {
-		System.out.println("Wie hoch ist der Geldeinsatz?");
-		int einsatz = scanner.nextInt();
+        // Farbliches Ausgeben des Ergebnisses
+        printWinningNumber(result);
 
-		while(einsatz <= 0) {
-			System.out.println("Bitte positiven / gültigen Betrag eingeben!");			
-			einsatz = scanner.nextInt();
-		}
+        if (input == result) {
+            account = win(account, bet, 36);
+        } else {
+            lose(bet);
+        }
 
-		while (isBetValid(account, einsatz) != true) {
-			System.out.println("Konto überzogen! Bitte kleineren Betrag angeben");
-			einsatz = scanner.nextInt();
-			isBetValid(account, einsatz);
-		}
+        return account;
+    }
 
-		return einsatz;
-	}
+    private static boolean isNumberValid(int input) {
+        if (input > 36 || input < 0) {
+            return false;
+        } else {
+            return true;
+        }
+    }
 
-	public static boolean isInputValid(String eingabe, String[] ergebnis) {	
-		for (String string : ergebnis) {
-			if (eingabe.trim().equalsIgnoreCase(string)) {
-				return true;
-			}
-		}
-		return false;		
-	}
+    public static boolean isAccountInputValid(int input) {
+        if (input > 1000 || input < 1) {
+            return false;
+        } else {
+            return true;
+        }
+    }
 
-	public static boolean isBetValid(int account, int einsatz) {	
-		if (einsatz > account) {
-			return false;
-		} else {
-			return true;
-		}
-	}
+    private static int placeBet(Scanner scanner, int account) {
+        System.out.println("Wie hoch ist der Geldeinsatz?");
+        int bet = 0;
+        boolean eingabeistzahl = false;
+        while (eingabeistzahl == false) {
+            try {
+                bet = scanner.nextInt();
+            } catch (Exception ex) {
+                System.out.println("Bitte gültigen Betrag eingeben!");
+                scanner.next();
+                continue;
+            }
+            eingabeistzahl = true;
+        }
 
-	public static int addToAccount(Scanner scanner) {	
-		System.out.println("Wie viel möchten Sie aufladen? (1-1000€ möglich)");
-		int eingabe = checkAccountInput(scanner);
-		
-		while (isAccountInputValid(eingabe) == false) {
-			System.out.println("Bitte einen Betrag zwischen 1€ und 1000€ eingeben:");
-			eingabe = checkAccountInput(scanner);
-			isAccountInputValid(eingabe);
-		}
-		System.out.println("");
+        while(bet <= 0) {
+            System.out.println("Bitte positiven / gültigen Betrag eingeben!");
+            bet = scanner.nextInt();
+        }
 
-		return eingabe;
-	}
+        while (isBetValid(account, bet) != true) {
+            System.out.println("Konto überzogen! Bitte kleineren Betrag angeben");
+            bet = scanner.nextInt();
+            isBetValid(account, bet);
+        }
 
-	private static int checkAccountInput(Scanner scanner) {
-		int eingabe = 0;
-		while (isAccountInputValid(eingabe) == false) {
-			try{
-				eingabe = scanner.nextInt();
-				if (eingabe > 1000 || eingabe < 1  ) {
-					System.out.println("Bitte einen Wert zwischen 1 und 1000 angeben");
-				}
-			} catch(Exception ex) {
-				System.out.println("Bitte eine Zahl eingeben!");
-				scanner.next();
-				continue;
-			}
-		} 
-		if (isAccountInputValid(eingabe)== false) {
-			System.out.println("Bitte Zahl zwischen 1 und 1000 eingeben:");
-			checkAccountInput(scanner);
-		}
-		return eingabe;		
-	}
-	
-	private static int checkNumberInput(Scanner scanner) {
-		int eingabe = -1;
-		while (isNumberValid(eingabe)==false) {
-			try{
-				eingabe = scanner.nextInt();
-				if (eingabe > 36 || eingabe < 0) {
-					System.out.println("Bitte einen Wert zwischen 0 und 36 angeben");
-				}
-			}catch(Exception ex){
-				System.out.println("Bitte eine Zahl eingeben!");
-				scanner.next();
-				continue;
-			}
-		}
-		return eingabe;		
-	}
+        return bet;
+    }
 
-	private static void printColourAnimation(int startPosition, int winningNumber) throws InterruptedException {
+    public static boolean isInputValid(String input, String[] result) {
+        for (String string : result) {
+            if (input.trim().equalsIgnoreCase(string)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
-		int currentPos = startPosition;
+    public static boolean isBetValid(int account, int bet) {
+        if (bet > account) {
+            return false;
+        } else {
+            return true;
+        }
+    }
 
-		while (currentPos < 37 && currentPos != winningNumber) {
-			System.out.print(wheel.get(currentPos));
-			currentPos++;
-			Thread.sleep(100);
-		} 
+    public static int addToAccount(Scanner scanner) {
+        System.out.println("Wie viel möchten Sie aufladen? (1-1000€ möglich)");
+        int input = checkAccountInput(scanner);
 
-		if (currentPos == winningNumber) {
-			System.out.print(wheel.get(currentPos));
-			return;
-		}
+        while (isAccountInputValid(input) == false) {
+            System.out.println("Bitte einen Betrag zwischen 1€ und 1000€ eingeben:");
+            input = checkAccountInput(scanner);
+            isAccountInputValid(input);
+        }
+        System.out.println("");
 
-		currentPos = 0;			
-		while (currentPos != winningNumber) {
-			System.out.print(wheel.get(currentPos));
-			currentPos++;
-			Thread.sleep(100);
-		}
-		Thread.sleep(100);
-		System.out.print(wheel.get(currentPos));
+        return input;
+    }
 
-	}
+    private static int checkAccountInput(Scanner scanner) {
+        int input = 0;
+        while (isAccountInputValid(input) == false) {
+            try{
+                input = scanner.nextInt();
+                if (input > 1000 || input < 1  ) {
+                    System.out.println("Bitte einen Wert zwischen 1 und 1000 angeben");
+                }
+            } catch(Exception ex) {
+                System.out.println("Bitte eine Zahl eingeben!");
+                scanner.next();
+                continue;
+            }
+        }
+        if (isAccountInputValid(input)== false) {
+            System.out.println("Bitte Zahl zwischen 1 und 1000 eingeben:");
+            checkAccountInput(scanner);
+        }
+        return input;
+    }
 
-	private static void printNumberAnimation() throws InterruptedException{
-		Random random = new Random();
-		for (int i = 0; i < 8; i++) {
-			System.out.println();
-			System.out.print("\rDie Kugel dreht sich... " + random.nextInt(36));
-			Thread.sleep(400);
-		}
-	}
+    private static int checkNumberInput(Scanner scanner) {
+        int input = -1;
+        while (isNumberValid(input)==false) {
+            try{
+                input = scanner.nextInt();
+                if (input > 36 || input < 0) {
+                    System.out.println("Bitte einen Wert zwischen 0 und 36 angeben");
+                }
+            }catch(Exception ex){
+                System.out.println("Bitte eine Zahl eingeben!");
+                scanner.next();
+                continue;
+            }
+        }
+        return input;
+    }
 
-	private static void printWinningNumber(int ergebnis) {
-		System.out.println();
-		if (wheel.get(ergebnis).equals("🔴")) {
-			System.out.println("\rDie Kugel liegt auf \u001B[31m" + ergebnis + "\u001B[0m.");
-		} else if (wheel.get(ergebnis).equals("⚫")) {
-			System.out.println("\rDie Kugel liegt auf \u001B[30m" + ergebnis + "\u001B[0m.");
-		} else {
-			System.out.println("\rDie Kugel liegt auf \u001B[30m" + ergebnis + "\u001B[0m.");
-		}
-	}
+    private static void printColourAnimation(int startPosition, int winningNumber) throws InterruptedException {
 
-	private static int win(int account, int einsatz, int multiplier) throws InterruptedException {
-		System.out.println();
-		System.out.println("\rDu hast gewonnen!");
-		Thread.sleep(400);
-		System.out.println("\u001B[32mDer Gewinn beträgt: " + einsatz * multiplier + "€\u001B[0m");
-		account = account + (einsatz * multiplier);
-		return account;
-	}
+        int currentPos = startPosition;
 
-	private static void lose(int einsatz) throws InterruptedException {
-		System.out.println();
-		System.out.println("\rDu hast leider verloren");
-		Thread.sleep(400);
-		System.out.println("\u001B[31mDer Verlust beträgt: -" + einsatz + "€\u001B[0m");
-	}
+        while (currentPos < 37 && currentPos != winningNumber) {
+            System.out.print(wheel.get(currentPos));
+            currentPos++;
+            Thread.sleep(100);
+        }
 
-	private static boolean newGame(Scanner scanner, String antwort) {
-		if (antwort.trim().equalsIgnoreCase("Ja") || antwort.trim().equalsIgnoreCase("J")) {
-			play = true;
-			return true;
-		} else if (antwort.trim().equalsIgnoreCase("Nein") || antwort.trim().equalsIgnoreCase("N")) {
-			play = false;
-			return true;
-		} else {
-			return false;			
-		}
-	}
+        if (currentPos == winningNumber) {
+            System.out.print(wheel.get(currentPos));
+            return;
+        }
+
+        currentPos = 0;
+        while (currentPos != winningNumber) {
+            System.out.print(wheel.get(currentPos));
+            currentPos++;
+            Thread.sleep(100);
+        }
+        Thread.sleep(100);
+        System.out.print(wheel.get(currentPos));
+
+    }
+
+    private static void printNumberAnimation() throws InterruptedException{
+        Random random = new Random();
+        for (int i = 0; i < 8; i++) {
+            System.out.println();
+            System.out.print("\rDie Kugel dreht sich... " + random.nextInt(36));
+            Thread.sleep(400);
+        }
+    }
+
+    private static void printWinningNumber(int result) {
+        System.out.println();
+        if (wheel.get(result).equals("🔴")) {
+            System.out.println("\rDie Kugel liegt auf \u001B[31m" + result + "\u001B[0m.");
+        } else if (wheel.get(result).equals("⚫")) {
+            System.out.println("\rDie Kugel liegt auf \u001B[30m" + result + "\u001B[0m.");
+        } else {
+            System.out.println("\rDie Kugel liegt auf \u001B[30m" + result + "\u001B[0m.");
+        }
+    }
+
+    private static int win(int account, int bet, int multiplier) throws InterruptedException {
+        System.out.println();
+        System.out.println("\rDu hast gewonnen!");
+        Thread.sleep(400);
+        System.out.println("\u001B[32mDer Gewinn beträgt: " + bet * multiplier + "€\u001B[0m");
+        account = account + (bet * multiplier);
+        return account;
+    }
+
+    private static void lose(int bet) throws InterruptedException {
+        System.out.println();
+        System.out.println("\rDu hast leider verloren");
+        Thread.sleep(400);
+        System.out.println("\u001B[31mDer Verlust beträgt: -" + bet + "€\u001B[0m");
+    }
+
+    private static boolean newGame(Scanner scanner, String antwort) {
+        if (antwort.trim().equalsIgnoreCase("Ja") || antwort.trim().equalsIgnoreCase("J")) {
+            play = true;
+            return true;
+        } else if (antwort.trim().equalsIgnoreCase("Nein") || antwort.trim().equalsIgnoreCase("N")) {
+            play = false;
+            return true;
+        } else {
+            return false;
+        }
+    }
 }
